@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 const app = express();
@@ -36,12 +36,31 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
+        const serviceCollection = client.db('carDoctor').collection('services');
         // send data with GET API
         app.get('/services', async (req, res) => {
-            const carCollection = client.db('carDoctor').collection('services');
-            const cursor = carCollection.find();
+            const cursor = serviceCollection.find();
             const result = await cursor.toArray();
             res.send(result);
+        })
+
+        //send data id wise
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            // specific data পাওয়ার জন্য option use করা হয়।
+            const options = {
+                // Include only the `title` and `imdb` fields in the returned document
+                //projection এর system হলো যদি কোনো id এর নির্দিষ্ট property পেতে চাই তাহলে property name: দিয়ে 1 (title:1)
+                // আর যদি _id না চাই তাহলে _id:0 দিতে হবে।
+                //_id না দিলেও এটা default পেয়ে যাবে।
+                projection: { title: 1, service_id: 1, price: 1 },
+
+            };
+
+            const service = await serviceCollection.findOne(query, options)
+            res.send(service)
         })
 
         // Send a ping to confirm a successful connection
