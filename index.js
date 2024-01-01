@@ -35,8 +35,10 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
-
+        //database
         const serviceCollection = client.db('carDoctor').collection('services');
+        const bookingsCollection = client.db('carDoctor').collection('bookings');
+
         // send data with GET API
         app.get('/services', async (req, res) => {
             const cursor = serviceCollection.find();
@@ -61,6 +63,11 @@ async function run() {
 
             const service = await serviceCollection.findOne(query, options)
             res.send(service)
+        })
+        //booking
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            console.log(booking)
         })
 
         // Send a ping to confirm a successful connection
