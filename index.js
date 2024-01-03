@@ -57,14 +57,32 @@ async function run() {
                 //projection এর system হলো যদি কোনো id এর নির্দিষ্ট property পেতে চাই তাহলে property name: দিয়ে 1 (title:1)
                 // আর যদি _id না চাই তাহলে _id:0 দিতে হবে।
                 //_id না দিলেও এটা default পেয়ে যাবে।
-                projection: { title: 1, service_id: 1, price: 1 },
+                projection: { title: 1, service_id: 1, price: 1, img: 1 },
 
             };
 
             const service = await serviceCollection.findOne(query, options)
             res.send(service)
         })
-        //booking
+        //get booking with query
+        app.get('/bookings', async (req, res) => {
+            //console.log(req.query) //যদি data set না করা থাকে তাহলে, server reload করলে empty একটা object পাওয়া যাবে।
+            //query হলো যেখানে special indirect কিছু data/query params পাঠানো যেট  দিয়ে database থেকে specific কিছু data লোড করার হয়।
+            //url (?) sign দিয়ে query শুরু হয়ে (=) equal দিয়ে value দিতে হয়।
+            // & sing এর পরে আরো query করা যায়।
+            // http://localhost:5000/bookings?email=shahin@alltender.com&sort=1
+            console.log(req.query.email)
+            let query = {};
+            if (req.query?.email) {
+                query = { email: req.query.email };
+            }
+
+            //set query to find query data from database
+            const result = await bookingsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        //booking post 
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
             // console.log(booking)
