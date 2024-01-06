@@ -89,6 +89,18 @@ async function run() {
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
         })
+        // booking update
+        app.put('/bookings/:id', (req, res) => {
+            const updatingBooking = req.body;
+        })
+        // booking delete
+        app.delete('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            const result = await bookingsCollection.deleteOne(query);
+            res.send(result)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
